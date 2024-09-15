@@ -1,8 +1,5 @@
 # Changelog
 
-## 2.0.2
-* Bugfix crashing
-
 ## 2.0.1
 * Bug fixes related to cache
 * improvements

@@ -85,14 +85,13 @@ public class FlutterPluginPdfViewerPlugin implements FlutterPlugin, MethodCallHa
                                 if (pageResult == null) {
                                     Log.d(TAG, "Retrieving page failed.");
                                     result.notImplemented();
-                                }else {
-                                    mainThreadHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            result.success(pageResult);
-                                        }
-                                    });
                                 }
+                                mainThreadHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        result.success(pageResult);
+                                    }
+                                });
                                 break;
                             default:
                                 result.notImplemented();
@@ -154,13 +153,12 @@ public class FlutterPluginPdfViewerPlugin implements FlutterPlugin, MethodCallHa
     }
 
     private String createTempPreview(Bitmap bmp, String name, int page) {
-     if (context == null) {
+        if (context == null) {
             Log.d(TAG, "createTempPreview: Context is null!");
             return null;
         }
         String fileNameOnly = getFileNameFromPath(name);
         File file;
-        File to;
         try {
             String fileName = String.format(Locale.US, "%s-%d.png", fileNameOnly, page);
             file = File.createTempFile(fileName, null, context.getCacheDir());
@@ -168,15 +166,11 @@ public class FlutterPluginPdfViewerPlugin implements FlutterPlugin, MethodCallHa
             bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
             out.flush();
             out.close();
-            //what you are renaming the file to
-            to = new File(context.getCacheDir(), fileName);
-//            //now rename
-            file.renameTo(to);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        return to.getAbsolutePath();
+        return file.getAbsolutePath();
     }
 
     private String getPage(String filePath, @Nullable Integer pageNumber) {
@@ -206,6 +200,7 @@ public class FlutterPluginPdfViewerPlugin implements FlutterPlugin, MethodCallHa
                 ret = createTempPreview(bitmap, filePath, pageNumber);
             } finally {
                 page.close();
+                renderer.close();
             }
             return ret;
         } catch (Exception ex) {
